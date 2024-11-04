@@ -1,0 +1,221 @@
+# initialization of lists required.
+main_list = []
+sub_list = []
+staff_student_list=["staff","student"]
+# initialization of variables required.
+Progress_count = 0
+Module_trailer_count = 0
+Module_Retriever_count = 0
+Exclude_count=0
+total_count=0
+
+#function for getting if the user is a student or staff
+def student_Staff ():
+         global staff_or_student
+         while True:
+             staff_or_student=input("Enter 'Staff' or 'Student' : ").lower()
+             if staff_or_student in staff_student_list:
+                 break
+             else:
+                 print("Invalid input, please try again.")
+                 
+# calling the user define function (student_staff)
+student_Staff()
+
+# main function
+def main():
+
+    # function for taking user inputs for credit scores individually.
+    def user_inputs():
+        global pass_credit, defer_credit, fail_credit
+
+
+        # calling the function 'valid_input'
+        pass_credit = valid_input("pass")
+        defer_credit = valid_input("defer")
+        fail_credit = valid_input("fail")
+
+        total = pass_credit + defer_credit + fail_credit
+        valid_total(total)
+
+    # function for validating the user input data by the required range and the required data type.
+    def valid_input(progress_level):
+        while True:
+            try:
+                user_information = int(input(f"Enter credits of {progress_level} : "))
+                if 0 <= user_information <= 120 and user_information % 20 == 0:
+                    return user_information
+                else:
+                    print("Entered value is out of range")
+                    print("plese Enter again ")
+            except ValueError:
+                print("Entered value is unrecognized.\nPlease enter an Integer")
+
+    # function for checking the required total of user inputs.
+    def valid_total(total):
+        global progress
+        if total == 120:
+            progress = progression_outcome(pass_credit, defer_credit, fail_credit)
+            sub_list.append(progress)
+            lists(total)
+            print("Progression outcome = ", progress)
+        else:
+            print("total is incorrect\n please enter again")
+            user_inputs()
+
+    # function for determine the progression outcome using user inputs.
+    def progression_outcome(Pass, Defer, Fail):
+        global progression_outcomes,Progress_count,Module_trailer_count,Exclude_count,Module_Retriever_count
+        progression_outcomes = ["Progress", "Progress (module trailer)", "Module Retriever", "Exclude"]
+        if Pass == 120:
+            Progress_count += 1
+            return progression_outcomes[0]
+        elif Pass == 100:
+            Module_trailer_count += 1
+            return progression_outcomes[1]
+        elif 80 <= Fail <= 120:
+            Exclude_count += 1
+            return progression_outcomes[3]
+        else:
+            Module_Retriever_count += 1
+            return progression_outcomes[2]
+
+    # function for saving results in a list.
+    def lists(total):
+        global sub_list
+        if total == 120:
+            sub_list = [pass_credit, defer_credit, fail_credit, progress]
+        else:
+            sub_list = []
+        main_list.append([sub_list[3] + " - " + str(sub_list[0]) + ", " + str(sub_list[1]) + ", " + str(sub_list[2])])
+
+    # calling the user define function (user_inputs)
+    user_inputs()
+
+# calling the main user define function
+main()
+
+# looping the program or getting the results of user inputs according to the user input.
+while True:
+    if staff_or_student == staff_student_list[1]:
+        break
+    choose = input("\nEnter 'y' if you want to enter another set of data or 'q' to quit. ").lower()
+    if choose == "y":
+        main()
+    elif choose == "q":
+        for i in main_list:
+            print(i[0])
+        with open('progression_data.txt', 'w') as file: #creating and storing progression data in text file.
+            for entry in main_list:
+                file.write(str(entry[0]) + '\n')
+        print("Progression data saved to progression_data.txt")
+        break
+    else:
+        print("enter required inputs")
+
+# importing the graphics module.
+from graphics import *
+
+# function for creating and displaying the histogram.
+def graph ():
+    # creating the background window for the histogram.
+    win = GraphWin("Histogram", 800, 700)
+    win.setBackground(color_rgb(237, 242, 236))
+
+    #Histogram result text as the heading
+    text= Text(Point(145,30),"Histogram Results")
+    text.setTextColor(color_rgb(97,97,97))
+    text.setStyle("bold")
+    text.setSize(15)
+    text.draw(win)
+
+    #Creating the line under the rectangle.
+    line=Line(Point(50,600), Point(750,600))
+    line.draw(win)
+
+    #Typing progression results under required rectangles.
+    text_1= Text(Point(145,615),"Progress")
+    text_1.setTextColor(color_rgb(125,131,152))
+    text_1.setStyle("bold")
+    text_1.setSize(15)
+    text_1.draw(win)
+
+    text_2= Text(Point(315,615),"Trailer")
+    text_2.setTextColor(color_rgb(125,131,152))
+    text_2.setStyle("bold")
+    text_2.setSize(15)
+    text_2.draw(win)
+
+    text_3= Text(Point(485,615),"Retriever")
+    text_3.setTextColor(color_rgb(125,131,152))
+    text_3.setStyle("bold")
+    text_3.setSize(15)
+    text_3.draw(win)
+
+    text_4= Text(Point(655,615),"Exclude")
+    text_4.setTextColor(color_rgb(125,131,152))
+    text_4.setStyle("bold")
+    text_4.setSize(15)
+    text_4.draw(win)
+
+    #calculating and displaying the total result count.
+    total_count = Progress_count + Module_trailer_count + Module_Retriever_count + Exclude_count
+    text= Text(Point(250,660),str(total_count)+" Outcomes in total")
+    text.setTextColor(color_rgb(125,131,152))
+    text.setStyle("bold")
+    text.setSize(18)
+    text.draw(win)
+
+    #creating rectangular bars in the histogram.
+    height1=600-Progress_count*15
+    bar1=Rectangle(Point(70,600),Point(220,height1))
+    bar1.setFill(color_rgb(144, 238, 144))
+    bar1.draw(win)
+
+    height2= 600 - Module_trailer_count * 15
+    bar2=Rectangle(Point(240,600),Point(390,height2))
+    bar2.setFill(color_rgb(147, 197, 114))
+    bar2.draw(win)
+
+    height3=600-Module_Retriever_count*15
+    bar3=Rectangle(Point(410,600),Point(560,height3))
+    bar3.setFill(color_rgb(138, 154, 91))
+    bar3.draw(win)
+
+    height4=600-Exclude_count*15
+    bar4=Rectangle(Point(580,600),Point(730,height4))
+    bar4.setFill(color_rgb(224, 191, 184))
+    bar4.draw(win)
+
+   #text on top of the rectangle
+    bar1_text=Text(Point(145,height1-10),Progress_count)
+    bar1_text.setTextColor(color_rgb(125,131,152))
+    bar1_text.setStyle("bold")
+    bar1_text.setSize(15)
+    bar1_text.draw(win)
+
+    bar2_text=Text(Point(315,height2-10),Module_trailer_count)
+    bar2_text.setTextColor(color_rgb(125,131,152))
+    bar2_text.setStyle("bold")
+    bar2_text.setSize(15)
+    bar2_text.draw(win)
+
+    bar3_text=Text(Point(485,height3-10),Module_Retriever_count)
+    bar3_text.setTextColor(color_rgb(125,131,152))
+    bar3_text.setStyle("bold")
+    bar3_text.setSize(15)
+    bar3_text.draw(win)
+
+    bar4_text=Text(Point(655,height4-10),Exclude_count)
+    bar4_text.setTextColor(color_rgb(125,131,152))
+    bar4_text.setStyle("bold")
+    bar4_text.setSize(15)
+    bar4_text.draw(win)
+    
+# calling the graph function.
+if staff_or_student == staff_student_list[1]:
+    exit
+else:
+    graph()
+
+
